@@ -1,18 +1,24 @@
 from django.shortcuts import render
-
-# Create your views here.
-from django.shortcuts import render
 from django.http import HttpResponse
-from .forms import UploadImageForm
-from .models import UploadImage
-# from tensorflow.keras.models import load_model
-# from tensorflow.keras.preprocessing import image
-# import keras
+from django.contrib.auth.models import User
+from django.contrib import messages
+from django.contrib.auth import authenticate,login
+from django.shortcuts import redirect
+from django.views.decorators.csrf import csrf_exempt
+from PIL import Image
+import  random
+import os
 
-import random
+
+from imageAnalyzer.forms import UploadImageForm
+from imageAnalyzer.models import UploadImage
 
 
 def index(request):
+    return render(request,'index.html')
+
+
+def upload(request):
     # model_o = load_model('C:\\SCDProject\\static\\model_melanoma_non_new_10.h5')
     submitted = False
     imagename = ""
@@ -30,23 +36,23 @@ def index(request):
             p_image = UploadImage.objects.get(user=user)
             # from keras.utils import load_img
             # import tensorflow
-            import cv2
+            #import cv2
 
             # 1 img = tensorflow.keras.preprocessing.image.load_img("C:\\SCDProject"+p_image.image.url,target_size = (200,200))
 
             # denoising
 
-            src = cv2.imread("C:\\SCDProject" + p_image.image.url)
-            grayScale = cv2.cvtColor(src, cv2.COLOR_RGB2GRAY)
-            kernel = cv2.getStructuringElement(1, (17, 17))
-            blackhat = cv2.morphologyEx(grayScale, cv2.MORPH_BLACKHAT, kernel)
-            ret, thresh2 = cv2.threshold(blackhat, 10, 255, cv2.THRESH_BINARY)
-            dst = cv2.inpaint(src, thresh2, 1, cv2.INPAINT_TELEA)
+            #src = cv2.imread("C:\\SCDProject" + p_image.image.url)
+            #grayScale = cv2.cvtColor(src, cv2.COLOR_RGB2GRAY)
+            #kernel = cv2.getStructuringElement(1, (17, 17))
+            #blackhat = cv2.morphologyEx(grayScale, cv2.MORPH_BLACKHAT, kernel)
+            #ret, thresh2 = cv2.threshold(blackhat, 10, 255, cv2.THRESH_BINARY)
+            #dst = cv2.inpaint(src, thresh2, 1, cv2.INPAINT_TELEA)
             # cv2.imshow("InPaint", dst)
-            cv2.imwrite("C:\\SCDProject" + p_image.image.url + ".jpg", dst, [int(cv2.IMWRITE_JPEG_QUALITY), 90])
+            #cv2.imwrite("C:\\SCDProject" + p_image.image.url + ".jpg", dst, [int(cv2.IMWRITE_JPEG_QUALITY), 90])
 
-            cleaned_img = tensorflow.keras.preprocessing.image.load_img("C:\\SCDProject" + p_image.image.url + ".jpg",
-                                                                        target_size=(200, 200))
+            #cleaned_img = tensorflow.keras.preprocessing.image.load_img("C:\\SCDProject" + p_image.image.url + ".jpg",
+                                                                        #target_size=(200, 200))
             # context = p_image
 
             import warnings
@@ -70,4 +76,11 @@ def index(request):
     form = UploadImageForm
     # p_image = UploadImage.objects.get(user=user)
 
+    # load model
+    no = int(random.randint(1, 99999999999999))
+    context = p_image
+    return render(request, 'emp_upload.html',
+                  {'form': form, 'submitted': submitted, 'context': context, 'result': result, 'no': no,
+                   'imagename': imagename})
 
+# Create your views here.
